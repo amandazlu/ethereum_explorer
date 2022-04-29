@@ -6,7 +6,7 @@ import TransactionTable from "./TransactionTable";
 const TransactionPage = (props) => {
     const [watchAddress, setWatchAddress] = useState("0x3057471208FEe8D6a079ae7664B89211497A4883");
     
-    
+    const { fetch, data, isLoading, isFetching} = useMoralisCloudFunction("getEthTransactions", {address: watchAddress});
 
 
     //PLACEHOLDER: call the 'getEthTransactions' cloud function
@@ -26,15 +26,21 @@ const TransactionPage = (props) => {
 
     //helper function to extract array of transactions from the object that 'getEthTransactions' returns
     const postProcess = (raw) => {
-        return (raw?.results?.map((res) => {
-            return res.attributes
-        }) || []);
+        const transArray = raw?.results?.results;
+        if(!transArray) {
+            return [];
+        }
+        else {
+            return (transArray.map((res) => {
+                return res.attributes;
+            }));
+        }
     }
 
     return (
         <div>
             <SearchBar setAddress={/*Placeholder*/() => {}}/>
-            <TransactionTable loading={/*Placeholder*/true} transactions={postProcess([]/*Placeholder*/)}/>
+            <TransactionTable loading={isLoading} transactions={postProcess(data)}/>
         </div>
     )  
 };
